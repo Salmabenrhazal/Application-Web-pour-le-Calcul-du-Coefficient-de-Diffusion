@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template_string,render_template,jsonify
 import numpy as np
+import webview
+import threading
 
 app = Flask(__name__)
 
@@ -103,6 +105,19 @@ def page_not_found(error):
 @app.errorhandler(500)
 def server_error(error):
     return jsonify({"error": "Erreur interne du serveur"}), 500
-# Démarrer l'application
-if __name__ == '__main__':
-    app.run(debug=True)
+# Fonction pour lancer Flask dans un thread séparé
+def start_flask():
+    app.run(debug=False, port=5001)  # Utiliser un autre port
+
+# Fonction pour lancer pywebview
+def start_webview():
+    webview.create_window("Calculateur de Coefficient de Diffusion", "http://127.0.0.1:5001/", width=800, height=600)
+    webview.start()
+
+# Point d'entrée pour exécuter l'application
+if _name_ == '_main_':
+    # Démarrer Flask dans un thread séparé
+    threading.Thread(target=start_flask).start()
+
+    # Démarrer pywebview
+    start_webview()
